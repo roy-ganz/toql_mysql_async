@@ -131,9 +131,10 @@ where C: 'a + Queryable,
         {
             count(&mut self.backend, query).await
         }
-    async fn delete_one<K>(&mut self, key: &mut K) -> Result<u64, Self::Error>
-    where  K: Key + ToQuery<<K as Key>::Entity> +Send, <K as Key>::Entity: Send,  <K as Key>::Entity: Delete {
-            let query = key.to_query();
+    async fn delete_one<K, B>(&mut self, key: B) -> Result<u64, Self::Error>
+    where  B: Borrow<K> + Send, K: Key + ToQuery<<K as Key>::Entity> + Send, <K as Key>::Entity: Send,  <K as Key>::Entity: Delete 
+    {
+            let query = key.borrow().to_query();
             delete(&mut self.backend, query).await?;
             Ok(0)
     }
