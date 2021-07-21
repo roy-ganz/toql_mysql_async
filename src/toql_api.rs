@@ -16,14 +16,15 @@ use crate::error::ToqlMySqlAsyncError;
 use crate::MySqlAsync;
 
 use crate::row::Row;
-use toql::prelude::FromRow;
+use toql::prelude::{FromRow, Key, ToQuery};
 
 use std::borrow::BorrowMut;
 
- use toql::toql_api::{fields::Fields, paths::Paths, update::Update, insert::Insert, load::Load, count::Count, delete::Delete};
+use toql::toql_api::{fields::Fields, paths::Paths, update::Update, insert::Insert, load::Load, count::Count, delete::Delete};
  
-  use toql::backend::{load::load, count::count, insert::insert, update::update, delete::delete};
-  
+use toql::backend::{load::load, count::count, insert::insert, update::update, delete::delete};
+
+
 
 use crate::mysql_async::prelude::Queryable;
 use mysql_async::Conn;
@@ -130,4 +131,17 @@ where C: 'a + Queryable,
         {
             count(&mut self.backend, query).await
         }
+    async fn delete_one<K>(&mut self, key: &mut K) -> Result<u64, Self::Error>
+    where  K: Key + ToQuery<<K as Key>::Entity> +Send, <K as Key>::Entity: Send,  <K as Key>::Entity: Delete {
+            let query = key.to_query();
+            delete(&mut self.backend, query).await?;
+            Ok(0)
+    }
+
+    async fn delete_many<T, B>(&mut self, query: B) -> Result<u64, Self::Error>
+    where T: Delete, B: Borrow<Query<T>> + Send + Sync, 
+    <Self as ToqlApi>::Error: From<ToqlError> {
+            delete(&mut self.backend, query).await?;
+             Ok(0)
+    }
 }
