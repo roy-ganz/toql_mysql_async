@@ -45,10 +45,12 @@ pub use mysql_async; // Reexport for derive produced code
 
 use mysql_async::prelude::Queryable;
 use mysql_async::Conn;
+use row::Row;
+use mysql_async::Value;
 
 use crate::backend::MySqlAsyncBackend;
 
-use toql::{prelude::{Context, Cache, SqlArg}};
+use toql::prelude::{Context, Cache, SqlArg};
 
 
 
