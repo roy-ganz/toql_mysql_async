@@ -26,8 +26,9 @@ use toql::backend::{load::load, count::count, insert::insert, update::update, de
 
 
 
-use crate::mysql_async::prelude::Queryable;
-use mysql_async::Conn;
+
+use mysql_async::{prelude::Queryable, Conn};
+
 
 
 #[async_trait]

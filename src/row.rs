@@ -1,5 +1,5 @@
 use crate::error::ToqlMySqlAsyncError;
-use crate::mysql_async::chrono::NaiveDateTime;
+use mysql_async::chrono::NaiveDateTime;
 use toql::sql_builder::select_stream::Select;
 /// Newtype for mysql database row
 /// This allows to implement the conversion traits for basic data
