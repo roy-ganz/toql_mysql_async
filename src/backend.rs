@@ -1,11 +1,11 @@
 
 use toql::backend::Backend;
 use toql::sql_builder::build_result::BuildResult;
-use toql::{page::Page, prelude::{Cache, Context, SqlArg, Sql, AliasFormat, SqlMapperRegistry, ToqlError}};
+use toql::prelude::{Cache, Context, SqlArg, Sql, AliasFormat, SqlMapperRegistry, ToqlError, val, Page};
 
 
 use mysql_async::prelude::Queryable;
-use mysql_async::Conn;
+
 use crate::row::Row;
 use crate::error::ToqlMySqlAsyncError;
 use crate::result::Result;
@@ -13,23 +13,22 @@ use std::ops::Deref;
  use std::{sync::{RwLockWriteGuard, RwLockReadGuard}, collections::{HashMap, HashSet}};
  
 use async_trait::async_trait;
- 
-
+ use mysql_async::{Conn, TxOpts, Transaction};
+use owning_ref::BoxRef;
 
 pub(crate) struct MySqlAsyncBackend<'a, C>
-where  C: 'a + Queryable,
- for<'b> &'b C: std::ops::Deref<Target = Conn>
+where C: Queryable
  {
     pub conn: C,
     pub(crate) context: Context,
     pub(crate) cache: &'a mut Cache, 
 }
 
+
 /// Interface for Toql functions 
 #[async_trait]
 impl<'a, C> Backend<Row, ToqlMySqlAsyncError> for MySqlAsyncBackend<'a, C> 
-where C: 'a + Queryable, 
-for<'b> &'b C: std::ops::Deref<Target = Conn>
+where C: Queryable
 {
  fn registry(&self) -> std::result::Result<RwLockReadGuard<'_, SqlMapperRegistry>, ToqlError> {
      self.cache.registry.read().map_err(ToqlError::from)
@@ -95,17 +94,18 @@ for<'b> &'b C: std::ops::Deref<Target = Conn>
       let Sql(sql_stmt, args) = sql;
         let args = crate::sql_arg::values_from_ref(&args);
         self.conn.exec_drop(sql_stmt, args).await?;  
-        let affected_rows = (&self.conn).deref().affected_rows();
-        let start_id = (&self.conn).deref().last_insert_id();
+        let affected_rows :Option<u64>= self.conn.query_first("SELECT ROW_COUNT()").await?;
+        let last_insert_id :Option<u64>= self.conn.query_first("SELECT LAST_INSERT_ID()").await?;
+        let affected_rows = val!(affected_rows);
+        let start_id = val!(last_insert_id);
         let mut ids :Vec<SqlArg>= Vec::with_capacity(affected_rows as usize);
-        if let Some(start_id) = start_id{
-
-            let mut id = start_id;
-            for _i in 0..affected_rows {
-                ids.push(SqlArg::U64(id.into()));
-                id += 1;
-            }
+        
+        let mut id = start_id;
+        for _i in 0..affected_rows {
+            ids.push(SqlArg::U64(id.into()));
+            id += 1;
         }
+        
         Ok(ids)
         
     } 

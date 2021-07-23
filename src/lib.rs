@@ -48,21 +48,21 @@ mod test;
 
 use crate::backend::MySqlAsyncBackend;
 use toql::prelude::{Context, Cache, SqlArg};
-use mysql_async::{Conn, prelude::Queryable};
+use mysql_async::prelude::Queryable;
+use std::ops::Deref;
+use crate::result::Result;
 
-pub struct MySqlAsync<'a, C>
-where  C: 'a + Queryable,
-for<'b> &'b C: std::ops::Deref<Target = Conn>
+pub struct MySqlAsync<'a, C> where C: Queryable
 {
-    backend: MySqlAsyncBackend<'a, C>
+    backend: MySqlAsyncBackend<'a, C>,
+   
 }
    
 
 /// Public API 
-impl<'a, C> MySqlAsync<'a, C> where 
- C: 'a + Queryable ,
- for<'b> &'b C: std::ops::Deref<Target = Conn>{
-    /// Create connection wrapper from MySqlAsync connection or transaction.
+impl<'a, C> MySqlAsync<'a, C> where C: Queryable
+{
+     /// Create connection wrapper from MySqlAsync connection or transaction.
     ///
     /// Use the connection wrapper to access all Toql functionality.
     pub fn from(conn: C, cache: &'a mut Cache) -> MySqlAsync<'a, C> {
@@ -70,13 +70,21 @@ impl<'a, C> MySqlAsync<'a, C> where
         Self::with_context(conn, cache,Context::default())
     }
 
+
+
+        pub fn into_inner(self) -> C {
+            self.backend.conn
+        }
+
+
+   
      pub fn with_context(conn: C, cache: &'a mut Cache, context: Context) -> MySqlAsync<'a, C> {
          MySqlAsync{
             backend: MySqlAsyncBackend {
                     conn,
                     cache,
                     context
-                }
+                },
             }
     }
 
@@ -85,10 +93,14 @@ impl<'a, C> MySqlAsync<'a, C> where
         self.backend.context.roles = roles;
         self
     }
-
-    pub fn conn(&mut self) -> &'_ mut C {
-       &mut self.backend.conn
+/* 
+    pub fn conn(&mut self) -> &Conn {
+       &self.backend.conn
     }
+
+    pub fn conn_mut(&mut self) -> &mut Conn {
+       &mut self.backend.conn
+    } */
 
     pub fn registry(
         &self,

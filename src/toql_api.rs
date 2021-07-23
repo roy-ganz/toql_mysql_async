@@ -27,14 +27,11 @@ use toql::backend::{load::load, count::count, insert::insert, update::update, de
 
 
 
-use mysql_async::{prelude::Queryable, Conn};
-
+use mysql_async::prelude::Queryable;
 
 
 #[async_trait]
-impl<'a, C> ToqlApi  for MySqlAsync<'a, C>
-where C: 'a + Queryable,
- for<'b> &'b C: std::ops::Deref<Target = Conn>
+impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable
  {
 
     type Row = Row;
