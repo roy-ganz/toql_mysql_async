@@ -20,7 +20,7 @@ where C: Queryable
  {
     pub conn: C,
     pub(crate) context: Context,
-    pub(crate) cache: &'a mut Cache, 
+    pub(crate) cache: &'a Cache, 
 }
 
 

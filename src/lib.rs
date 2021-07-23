@@ -65,7 +65,7 @@ impl<'a, C> MySqlAsync<'a, C> where C: Queryable
      /// Create connection wrapper from MySqlAsync connection or transaction.
     ///
     /// Use the connection wrapper to access all Toql functionality.
-    pub fn from(conn: C, cache: &'a mut Cache) -> MySqlAsync<'a, C> {
+    pub fn from(conn: C, cache: &'a Cache) -> MySqlAsync<'a, C> {
         
         Self::with_context(conn, cache,Context::default())
     }
@@ -81,7 +81,7 @@ impl<'a, C> MySqlAsync<'a, C> where C: Queryable
 
 
    
-     pub fn with_context(conn: C, cache: &'a mut Cache, context: Context) -> MySqlAsync<'a, C> {
+     pub fn with_context(conn: C, cache: &'a Cache, context: Context) -> MySqlAsync<'a, C> {
          MySqlAsync{
             backend: MySqlAsyncBackend {
                     conn,
