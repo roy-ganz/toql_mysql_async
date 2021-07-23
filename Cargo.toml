@@ -18,7 +18,6 @@ mysql_async = "0.27"
 async-trait = "0.1"
 
 log= "0.4"
-owning_ref ="0.4"
 
 [dev-dependencies]
 tokio ={ version = "1", features = ["full"] }

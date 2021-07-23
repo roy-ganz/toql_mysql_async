@@ -14,7 +14,6 @@ use std::ops::Deref;
  
 use async_trait::async_trait;
  use mysql_async::{Conn, TxOpts, Transaction};
-use owning_ref::BoxRef;
 
 pub(crate) struct MySqlAsyncBackend<'a, C>
 where C: Queryable
