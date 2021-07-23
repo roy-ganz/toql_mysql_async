@@ -70,9 +70,12 @@ impl<'a, C> MySqlAsync<'a, C> where C: Queryable
         Self::with_context(conn, cache,Context::default())
     }
 
+        pub fn conn(&mut self) -> &mut C {
+            &mut self.backend.conn
+        }
 
 
-        pub fn into_inner(self) -> C {
+        pub fn into_conn(self) -> C {
             self.backend.conn
         }
 

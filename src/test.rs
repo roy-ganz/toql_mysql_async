@@ -96,8 +96,10 @@ async fn demo_transaction() -> Result<(), ToqlMySqlAsyncError> {
     // Query payments
     let loaded_payments= toql.load_many(query!(Payment, "*")).await?;
 
+    let _x : Option<u64> = toql.conn().query_first("SELECT 1").await?;
+
     // Dropped connection will go to the pool
-    let tx = toql.into_inner();
+    let tx = toql.into_conn();
     tx.rollback().await?; 
 
     // Pool must be disconnected explicitly because
