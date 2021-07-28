@@ -1,7 +1,7 @@
 
 use toql::backend::Backend;
 use toql::sql_builder::build_result::BuildResult;
-use toql::prelude::{Cache, Context, SqlArg, Sql, AliasFormat, SqlMapperRegistry, ToqlError, val, Page};
+use toql::prelude::{Cache, Context, SqlArg, Sql, AliasFormat, SqlMapperRegistry, ToqlError, val, Page, log_sql, log_mut_sql, log_literal_sql};
 
 
 use mysql_async::prelude::Queryable;
@@ -9,11 +9,11 @@ use mysql_async::prelude::Queryable;
 use crate::row::Row;
 use crate::error::ToqlMySqlAsyncError;
 use crate::result::Result;
-use std::ops::Deref;
+
  use std::{sync::{RwLockWriteGuard, RwLockReadGuard}, collections::{HashMap, HashSet}};
  
 use async_trait::async_trait;
- use mysql_async::{Conn, TxOpts, Transaction};
+
 
 pub(crate) struct MySqlAsyncBackend<'a, C>
 where C: Queryable
@@ -48,6 +48,7 @@ where C: Queryable
 
    async fn select_sql(&mut self, sql:Sql) -> Result<Vec<Row> >
       {
+        log_sql!(&sql);
         let Sql(sql_stmt, args) = sql;
 
         let args = crate::sql_arg::values_from_ref(&args);
@@ -66,15 +67,17 @@ where C: Queryable
             Page::Counted(start, records) => (start, records)
         };
         result.set_modifier("SQL_CALC_FOUND_ROWS".to_string());
-        result.set_extra(format!("LIMIT{},{}", start, number_of_records));
+        result.set_extra(format!("LIMIT {}, {}", start, number_of_records));
 
    }
    // Load page and number of records without page limitation
    async fn select_max_page_size_sql(&mut self, _sql:Sql) -> Result<u64> {
-       self.select_count_sql(Sql("SELECT FOUND_ROWS()".to_string(), vec![])).await
+       let sql = Sql("SELECT FOUND_ROWS()".to_string(), vec![]);
+       self.select_count_sql(sql).await
    }
    // Load single value
    async fn select_count_sql(&mut self, sql:Sql) -> Result<u64> {
+       log_sql!(&sql);
       let Sql(sql_stmt, args) = sql;
         let args = crate::sql_arg::values_from_ref(&args);
         let row :Option<u64>= self.conn.exec_first(sql_stmt, args).await?;
@@ -83,6 +86,7 @@ where C: Queryable
     } 
 
    async fn execute_sql(&mut self, sql:Sql) -> Result<()> {
+       log_mut_sql!(&sql);
         let Sql(sql_stmt, args) = sql;
         let args = crate::sql_arg::values_from_ref(&args);
         self.conn.exec_drop(sql_stmt, args).await?;
@@ -90,11 +94,16 @@ where C: Queryable
    }
    ///  Execute insert statement and return new keys
    async fn insert_sql(&mut self, sql:Sql) -> Result<Vec<SqlArg>>{
+       log_mut_sql!(&sql);
       let Sql(sql_stmt, args) = sql;
         let args = crate::sql_arg::values_from_ref(&args);
         self.conn.exec_drop(sql_stmt, args).await?;  
-        let affected_rows :Option<u64>= self.conn.query_first("SELECT ROW_COUNT()").await?;
-        let last_insert_id :Option<u64>= self.conn.query_first("SELECT LAST_INSERT_ID()").await?;
+        let row_count_sql= "SELECT ROW_COUNT()";
+        log_literal_sql!(&row_count_sql);
+        let affected_rows :Option<u64>= self.conn.query_first(row_count_sql).await?;
+        let last_insert_id = "SELECT LAST_INSERT_ID()";
+        log_literal_sql!(last_insert_id);
+        let last_insert_id :Option<u64>= self.conn.query_first(last_insert_id).await?;
         let affected_rows = val!(affected_rows);
         let start_id = val!(last_insert_id);
         let mut ids :Vec<SqlArg>= Vec::with_capacity(affected_rows as usize);
