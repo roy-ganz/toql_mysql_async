@@ -10,8 +10,6 @@ license = "MIT/Apache-2.0"
 repository = "https://github.com/roy-ganz/toql"
 
 [dependencies]
-#toql = { version="0.3", path = "../toql"}
-
 toql = { git="https://github.com/roy-ganz/toql.git", branch="v0.3"  }
 
 mysql_async = "0.27"
