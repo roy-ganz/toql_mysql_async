@@ -20,6 +20,9 @@ log= "0.4"
 [dev-dependencies]
 tokio ={ version = "1", features = ["full"] }
 
+[patch.'https://github.com/roy-ganz/toql.git']
+toql= {path="../toql"}
+
 
 
 

@@ -1,7 +1,7 @@
 
 use toql::backend::Backend;
 use toql::sql_builder::build_result::BuildResult;
-use toql::prelude::{Cache, Context, SqlArg, Sql, AliasFormat, SqlMapperRegistry, ToqlError, val, Page, log_sql, log_mut_sql, log_literal_sql};
+use toql::prelude::{Cache, Context, SqlArg, Sql, AliasFormat, TableMapperRegistry, ToqlError, val, Page, log_sql, log_mut_sql, log_literal_sql};
 
 
 use mysql_async::prelude::Queryable;
@@ -29,11 +29,11 @@ where C: Queryable
 impl<'a, C> Backend<Row, ToqlMySqlAsyncError> for MySqlAsyncBackend<'a, C> 
 where C: Queryable
 {
- fn registry(&self) -> std::result::Result<RwLockReadGuard<'_, SqlMapperRegistry>, ToqlError> {
+ fn registry(&self) -> std::result::Result<RwLockReadGuard<'_, TableMapperRegistry>, ToqlError> {
      self.cache.registry.read().map_err(ToqlError::from)
      
  }
-   fn registry_mut(&mut self) -> std::result::Result<RwLockWriteGuard<'_, SqlMapperRegistry>, ToqlError> {
+   fn registry_mut(&mut self) -> std::result::Result<RwLockWriteGuard<'_, TableMapperRegistry>, ToqlError> {
       self.cache.registry.write().map_err(ToqlError::from)
    }
    fn roles(&self) -> &HashSet<String> {

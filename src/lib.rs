@@ -7,7 +7,7 @@
 
 
 
-use toql::sql_mapper_registry::SqlMapperRegistry;
+use toql::table_mapper_registry::TableMapperRegistry;
 
 use toql::error::ToqlError;
  
@@ -107,7 +107,7 @@ impl<'a, C> MySqlAsync<'a, C> where C: Queryable
 
     pub fn registry(
         &self,
-    ) -> std::result::Result<RwLockReadGuard<'_, SqlMapperRegistry>, ToqlError> {
+    ) -> std::result::Result<RwLockReadGuard<'_, TableMapperRegistry>, ToqlError> {
         self.backend.cache.registry.read().map_err(ToqlError::from)
     }
     pub fn roles(&self) -> &HashSet<String> {
