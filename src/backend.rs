@@ -17,7 +17,7 @@ use async_trait::async_trait;
 
 
 pub(crate) struct MySqlAsyncBackend<'a, C>
-where C: Queryable
+where C: Queryable + Send
  {
     pub conn: C,
     pub(crate) context: Context,

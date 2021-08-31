@@ -55,7 +55,7 @@ use crate::queryable::Queryable;
 use std::ops::Deref;
 use crate::result::Result;
 
-pub struct MySqlAsync<'a, C> where C: Queryable
+pub struct MySqlAsync<'a, C> where C: Queryable + Send
 {
     backend: MySqlAsyncBackend<'a, C>,
    
@@ -63,7 +63,7 @@ pub struct MySqlAsync<'a, C> where C: Queryable
    
 
 /// Public API 
-impl<'a, C> MySqlAsync<'a, C> where C: Queryable
+impl<'a, C> MySqlAsync<'a, C> where C: Queryable + Send
 {
      /// Create connection wrapper from MySqlAsync connection or transaction.
     ///
