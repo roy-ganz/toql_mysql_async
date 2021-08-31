@@ -39,6 +39,8 @@ pub mod backend;
 pub mod toql_api;
 pub mod prelude;
 
+pub mod executable;
+
 // Reexport for derive produced code
 pub use mysql_async; 
 
@@ -48,11 +50,12 @@ mod test;
 
 use crate::backend::MySqlAsyncBackend;
 use toql::prelude::{Context, Cache, SqlArg};
-use mysql_async::prelude::Queryable;
+//use mysql_async::prelude::Queryable;
+use crate::executable::Executable;
 use std::ops::Deref;
 use crate::result::Result;
 
-pub struct MySqlAsync<'a, C> where C: Queryable
+pub struct MySqlAsync<'a, C> where C: Executable
 {
     backend: MySqlAsyncBackend<'a, C>,
    
@@ -60,7 +63,7 @@ pub struct MySqlAsync<'a, C> where C: Queryable
    
 
 /// Public API 
-impl<'a, C> MySqlAsync<'a, C> where C: Queryable
+impl<'a, C> MySqlAsync<'a, C> where C: Executable
 {
      /// Create connection wrapper from MySqlAsync connection or transaction.
     ///

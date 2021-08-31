@@ -4,7 +4,8 @@ use toql::sql_builder::build_result::BuildResult;
 use toql::prelude::{Cache, Context, SqlArg, Sql, AliasFormat, TableMapperRegistry, ToqlError, val, Page, log_sql, log_mut_sql, log_literal_sql};
 
 
-use mysql_async::prelude::Queryable;
+//use mysql_async::prelude::Queryable;
+use crate::executable::Executable;
 
 use crate::row::Row;
 use crate::error::ToqlMySqlAsyncError;
@@ -16,7 +17,7 @@ use async_trait::async_trait;
 
 
 pub(crate) struct MySqlAsyncBackend<'a, C>
-where C: Queryable
+where C: Executable
  {
     pub conn: C,
     pub(crate) context: Context,
@@ -27,7 +28,7 @@ where C: Queryable
 /// Interface for Toql functions 
 #[async_trait]
 impl<'a, C> Backend<Row, ToqlMySqlAsyncError> for MySqlAsyncBackend<'a, C> 
-where C: Queryable
+where C: Executable + Send
 {
  fn registry(&self) -> std::result::Result<RwLockReadGuard<'_, TableMapperRegistry>, ToqlError> {
      self.cache.registry.read().map_err(ToqlError::from)
