@@ -73,16 +73,14 @@ impl<'a, C> MySqlAsync<'a, C> where C: Queryable + Send
         Self::with_context(conn, cache,Context::default())
     }
 
-        pub fn conn(&mut self) -> &mut C {
-            &mut self.backend.conn
-        }
+    pub fn conn(&mut self) -> &mut C {
+        &mut self.backend.conn
+    }
 
 
-        pub fn into_conn(self) -> C {
-            self.backend.conn
-        }
-
-
+    pub fn into_conn(self) -> C {
+        self.backend.conn
+    }
    
      pub fn with_context(conn: C, cache: &'a Cache, context: Context) -> MySqlAsync<'a, C> {
          MySqlAsync{
@@ -97,16 +95,9 @@ impl<'a, C> MySqlAsync<'a, C> where C: Queryable + Send
    
     pub fn set_roles(&mut self, roles: HashSet<String>) -> &mut Self {
         self.backend.context.roles = roles;
+        self.backend.context.cache_string = None;
         self
     }
-/* 
-    pub fn conn(&mut self) -> &Conn {
-       &self.backend.conn
-    }
-
-    pub fn conn_mut(&mut self) -> &mut Conn {
-       &mut self.backend.conn
-    } */
 
     pub fn registry(
         &self,
@@ -126,5 +117,6 @@ impl<'a, C> MySqlAsync<'a, C> where C: Queryable + Send
     }
     pub fn set_aux_param(&mut self, name: String, value: SqlArg) {
         &self.backend.context.aux_params.insert(name, value);
+        self.backend.context.cache_string = None;
     }
  }

@@ -1,8 +1,9 @@
 
 use toql::backend::Backend;
-use toql::sql_builder::build_result::BuildResult;
+use toql::sql_builder::{select_stream::SelectStream, build_result::BuildResult};
 use toql::prelude::{Cache, Context, SqlArg, Sql, AliasFormat, TableMapperRegistry, ToqlError, val, Page, log_sql, log_mut_sql, log_literal_sql};
 
+use lru::LruCache;
 
 //use mysql_async::prelude::Queryable;
 use crate::queryable::Queryable;
@@ -51,6 +52,9 @@ where C: Queryable + Send
             self.context.refresh_cache_string();
         }
         self.context.cache_string.as_ref().unwrap()
+    }
+    fn cache(&self) ->std::result::Result<RwLockWriteGuard<'_, LruCache<String, (Sql,SelectStream, Option<Sql>, HashSet<String>)>>, ToqlError>  {
+        self.cache.query_cache.write().map_err(ToqlError::from)
     } 
 
    async fn select_sql(&mut self, sql:Sql) -> Result<Vec<Row> >
