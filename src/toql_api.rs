@@ -25,13 +25,13 @@ use toql::toql_api::{fields::Fields, paths::Paths, update::Update, insert::Inser
 use toql::backend::{load::load, count::count, insert::insert, update::update, delete::delete};
 
 
-use crate::executable::Executable;
+use crate::queryable::Queryable;
 
 //use mysql_async::prelude::Queryable;
 
 
 #[async_trait]
-impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Executable + Send
+impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
  {
 
     type Row = Row;
