@@ -46,6 +46,12 @@ where C: Queryable + Send
    fn aux_params(&self) -> &HashMap<String, SqlArg> {
        &self.context.aux_params
    }
+   fn cache_string(&mut self) -> &str {
+        if self.context.cache_string.is_none() {
+            self.context.refresh_cache_string();
+        }
+        self.context.cache_string.as_ref().unwrap()
+    } 
 
    async fn select_sql(&mut self, sql:Sql) -> Result<Vec<Row> >
       {
@@ -117,6 +123,7 @@ where C: Queryable + Send
         
         Ok(ids)
         
-    } 
+    }
+   
 
 }
