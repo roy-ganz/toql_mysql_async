@@ -95,7 +95,6 @@ impl<'a, C> MySqlAsync<'a, C> where C: Queryable + Send
    
     pub fn set_roles(&mut self, roles: HashSet<String>) -> &mut Self {
         self.backend.context.roles = roles;
-        self.backend.context.cache_string = None;
         self
     }
 
@@ -117,6 +116,5 @@ impl<'a, C> MySqlAsync<'a, C> where C: Queryable + Send
     }
     pub fn set_aux_param(&mut self, name: String, value: SqlArg) {
         &self.backend.context.aux_params.insert(name, value);
-        self.backend.context.cache_string = None;
     }
  }
