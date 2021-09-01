@@ -16,7 +16,7 @@ mysql_async = "0.27"
 async-trait = "0.1"
 
 
-log= "0.4"
+tracing= "0.1"
 lru="0.6"
 
 [dev-dependencies]

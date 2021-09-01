@@ -74,6 +74,7 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
     /// Load a struct with dependencies for a given Toql query.
     ///
     /// Returns a struct or a [ToqlMySqlAsyncError](../toql/error/enum.ToqlMySqlAsyncError.html) if no struct was found _NotFound_ or more than one _NotUnique_.
+    #[tracing::instrument(skip(self, query), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
     async fn load_one<T, B>(&mut self, query: B) -> Result<T, Self::Error>
     where
         T: Load<Self::Row, Self::Error>,
@@ -93,6 +94,7 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
     /// Returns a tuple with the structs and an optional tuple of count values.
     /// If `count` argument is `false`, no count queries are run and the resulting `Option<(u32,u32)>` will be `None`
     /// otherwise the count queries are run and it will be `Some((total count, filtered count))`.
+    #[tracing::instrument(skip(self, query), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
     async fn load_many<T, B>(&mut self, query: B) -> Result<Vec<T>, Self::Error>
     where
         T: Load<Self::Row, Self::Error>,
@@ -108,6 +110,7 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
     /// Returns a tuple with the structs and an optional tuple of count values.
     /// If `count` argument is `false`, no count queries are run and the resulting `Option<(u32,u32)>` will be `None`
     /// otherwise the count queries are run and it will be `Some((unpaged count, unfiltered count))`.
+    #[tracing::instrument(skip(self, query), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
     async fn load_page<T, B>(&mut self, query: B, page: Page) -> Result<(Vec<T>, Option<(u64, u64)>), Self::Error>
     where
         T: Load<Self::Row, Self::Error>,
