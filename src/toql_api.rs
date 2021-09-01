@@ -37,6 +37,7 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
     type Row = Row;
     type Error = ToqlMySqlAsyncError;
 
+    #[tracing::instrument(skip(self, entity, paths), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
   async fn insert_one<T>(&mut self, entity: &mut T, paths: Paths) -> Result<u64, Self::Error>
     where
         T: Insert 
@@ -48,6 +49,7 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
     ///
     /// Skip fields in struct that are auto generated with `#[toql(skip_inup)]`.
     /// Returns the last generated id.
+    #[tracing::instrument(skip(self, entities, paths), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
     async fn insert_many<T, Q>(&mut self, entities: &mut [Q], paths: Paths) -> Result<u64, Self::Error>
     where
         T: Insert,
@@ -55,14 +57,14 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
             insert(&mut self.backend, entities, paths).await
         }
 
-   
+   #[tracing::instrument(skip(self, entity, fields), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
     async fn update_one<T>(&mut self, entity: &mut T, fields: Fields) -> Result<(), Self::Error>
     where
         T: Update,
     {
         self.update_many::<T, _>(&mut [entity], fields).await
     }
-
+    #[tracing::instrument(skip(self, entities, fields), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
     async fn update_many<T, Q>(&mut self, entities: &mut [Q], fields: Fields) -> Result<(), Self::Error>
     where
         T: Update,
@@ -125,6 +127,7 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
     /// Counts the number of rows that match the query predicate.
     ///
     /// Returns a struct or a [ToqlMySqlAsyncError](../toql/error/enum.ToqlMySqlAsyncError.html) if no struct was found _NotFound_ or more than one _NotUnique_.
+    #[tracing::instrument(skip(self, query), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
     async fn count<T, B>(&mut self, query: B) -> Result<u64, Self::Error>
         where
             T: Count,
@@ -132,6 +135,8 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
         {
             count(&mut self.backend, query).await
         }
+
+    #[tracing::instrument(skip(self, key), fields(ty = %<<K as Key>::Entity as toql::table_mapper::mapped::Mapped>::type_name()))]
     async fn delete_one<K, B>(&mut self, key: B) -> Result<u64, Self::Error>
     where  B: Borrow<K> + Send, K: Key + ToQuery<<K as Key>::Entity> + Send, <K as Key>::Entity: Send,  <K as Key>::Entity: Delete 
     {
@@ -140,6 +145,7 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
             Ok(0)
     }
 
+    #[tracing::instrument(skip(self, query), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
     async fn delete_many<T, B>(&mut self, query: B) -> Result<u64, Self::Error>
     where T: Delete, B: Borrow<Query<T>> + Send + Sync, 
     <Self as ToqlApi>::Error: From<ToqlError> {
