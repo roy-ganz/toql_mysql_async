@@ -38,7 +38,7 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
     type Error = ToqlMySqlAsyncError;
 
     #[tracing::instrument(skip(self, entity, paths), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
-  async fn insert_one<T>(&mut self, entity: &mut T, paths: Paths) -> Result<u64, Self::Error>
+  async fn insert_one<T>(&mut self, entity: &mut T, paths: Paths) -> Result<(), Self::Error>
     where
         T: Insert 
     {
@@ -50,7 +50,7 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
     /// Skip fields in struct that are auto generated with `#[toql(skip_inup)]`.
     /// Returns the last generated id.
     #[tracing::instrument(skip(self, entities, paths), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
-    async fn insert_many<T, Q>(&mut self, entities: &mut [Q], paths: Paths) -> Result<u64, Self::Error>
+    async fn insert_many<T, Q>(&mut self, entities: &mut [Q], paths: Paths) -> Result<(), Self::Error>
     where
         T: Insert,
         Q: BorrowMut<T> + Send, {
