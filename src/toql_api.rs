@@ -16,7 +16,7 @@ use crate::error::ToqlMySqlAsyncError;
 use crate::MySqlAsync;
 
 use crate::row::Row;
-use toql::prelude::{FromRow, Key, ToQuery};
+use toql::prelude::{FromRow, Key};
 
 use std::borrow::BorrowMut;
 
@@ -138,10 +138,12 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
         }
 
     #[tracing::instrument(skip(self, key), fields(ty = %<<K as Key>::Entity as toql::table_mapper::mapped::Mapped>::type_name()))]
-    async fn delete_one<K, B>(&mut self, key: B) -> Result<u64, Self::Error>
-    where  B: Borrow<K> + Send, K: Key + ToQuery<<K as Key>::Entity> + Send, <K as Key>::Entity: Send,  <K as Key>::Entity: Delete 
+    async fn delete_one<K>(&mut self, key: K) -> Result<u64, Self::Error>
+    where K: Key + Send, <K as Key>::Entity: Send,  <K as Key>::Entity: Delete ,
+    K : Into<Query<<K as Key>::Entity>> 
+
     {
-            let query = key.borrow().to_query();
+            let query :Query<<K as Key>::Entity>= key.into();
             delete(&mut self.backend, query).await?;
             Ok(0)
     }
