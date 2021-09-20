@@ -42,7 +42,7 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
     where
         T: Insert 
     {
-        self.insert_many::<T, _>(&mut [entity], paths).await
+         insert::<_,_,T,_,_>(&mut self.backend, &mut [entity], paths).await
     }
 
     /// Insert one struct.
@@ -60,15 +60,16 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
    #[tracing::instrument(skip(self, entity, fields), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
     async fn update_one<T>(&mut self, entity: &mut T, fields: Fields) -> Result<(), Self::Error>
     where
-        T: Update,
+        T: Update + Keyed,
     {
-        self.update_many::<T, _>(&mut [entity], fields).await
+          update::<_,_,T,_,_>(&mut self.backend, &mut [entity], fields).await
+        
     }
     #[tracing::instrument(skip(self, entities, fields), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
     async fn update_many<T, Q>(&mut self, entities: &mut [Q], fields: Fields) -> Result<(), Self::Error>
     where
-        T: Update,
-        Q: BorrowMut<T> + Send,
+        T: Update + Keyed,
+        Q: BorrowMut<T> + Send + Sync,
     {
             update(&mut self.backend, entities, fields).await
     }

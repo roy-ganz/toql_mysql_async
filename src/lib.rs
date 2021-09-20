@@ -52,8 +52,6 @@ use crate::backend::MySqlAsyncBackend;
 use toql::prelude::{Context, Cache, SqlArg};
 //use mysql_async::prelude::Queryable;
 use crate::queryable::Queryable;
-use std::ops::Deref;
-use crate::result::Result;
 
 pub struct MySqlAsync<'a, C> where C: Queryable + Send
 {

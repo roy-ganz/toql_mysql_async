@@ -71,3 +71,4 @@ from_row!(
     f64,
     bool
 );
+
