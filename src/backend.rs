@@ -111,12 +111,13 @@ where C: Queryable + Send
         let start_id = val!(last_insert_id);
         let mut ids :Vec<SqlArg>= Vec::with_capacity(affected_rows as usize);
         
-        let mut id = start_id;
+        // Create ids in descending order: greatest id first, smallest id last
+        // This allows draining the Vec when setting the ids on the entities
+        let mut id = start_id + affected_rows - 1;
         for _i in 0..affected_rows {
             ids.push(SqlArg::U64(id.into()));
-            id += 1;
+            id -= 1;
         }
-        
         Ok(ids)
         
     }

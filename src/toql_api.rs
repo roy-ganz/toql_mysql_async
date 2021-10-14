@@ -1,4 +1,3 @@
-
 use async_trait::async_trait;
 
 use toql::keyed::Keyed;
@@ -8,7 +7,6 @@ use toql::query::Query;
 
 use toql::error::ToqlError;
 use toql::toql_api::ToqlApi;
- 
 
 use core::borrow::Borrow;
 
@@ -20,18 +18,25 @@ use toql::prelude::{FromRow, Key};
 
 use std::borrow::BorrowMut;
 
-use toql::toql_api::{fields::Fields, paths::Paths, update::Update, insert::Insert, load::Load, count::Count, delete::Delete};
- 
-use toql::backend::{load::load, count::count, insert::insert, update::update, delete::delete};
+use toql::toql_api::{
+    count::Count, delete::Delete, fields::Fields, insert::Insert, load::Load, paths::Paths,
+    update::Update,
+};
 
+use toql::{
+    backend::{count::count, delete::delete, insert::insert, load::load, update::update},
+    page_counts::PageCounts,
+};
 
 use crate::queryable::Queryable;
 
 //use mysql_async::prelude::Queryable;
 
-
+macro_rules! toql_api {
+        ($($type:ty),+) => {
+            $(
 #[async_trait]
-impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
+impl<'a, C> ToqlApi  for $type where C:Queryable + Send
  {
 
     type Row = Row;
@@ -40,7 +45,7 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
     #[tracing::instrument(skip(self, entity, paths), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
   async fn insert_one<T>(&mut self, entity: &mut T, paths: Paths) -> Result<(), Self::Error>
     where
-        T: Insert 
+        T: Insert
     {
          insert::<_,_,T,_,_>(&mut self.backend, &mut [entity], paths).await
     }
@@ -63,7 +68,7 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
         T: Update + Keyed,
     {
           update::<_,_,T,_,_>(&mut self.backend, &mut [entity], fields).await
-        
+
     }
     #[tracing::instrument(skip(self, entities, fields), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
     async fn update_many<T, Q>(&mut self, entities: &mut [Q], fields: Fields) -> Result<(), Self::Error>
@@ -114,7 +119,7 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
     /// If `count` argument is `false`, no count queries are run and the resulting `Option<(u32,u32)>` will be `None`
     /// otherwise the count queries are run and it will be `Some((unpaged count, unfiltered count))`.
     #[tracing::instrument(skip(self, query), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
-    async fn load_page<T, B>(&mut self, query: B, page: Page) -> Result<(Vec<T>, Option<(u64, u64)>), Self::Error>
+    async fn load_page<T, B>(&mut self, query: B, page: Page) -> Result<(Vec<T>, Option<PageCounts>), Self::Error>
     where
         T: Load<Self::Row, Self::Error>,
         B: Borrow<Query<T>> + Send + Sync,
@@ -140,7 +145,7 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
     #[tracing::instrument(skip(self, key), fields(ty = %<<K as Key>::Entity as toql::table_mapper::mapped::Mapped>::type_name()))]
     async fn delete_one<K>(&mut self, key: K) -> Result<u64, Self::Error>
     where K: Key + Send, <K as Key>::Entity: Send,  <K as Key>::Entity: Delete ,
-    K : Into<Query<<K as Key>::Entity>> 
+    K : Into<Query<<K as Key>::Entity>>
 
     {
             let query :Query<<K as Key>::Entity>= key.into();
@@ -150,9 +155,12 @@ impl<'a, C> ToqlApi  for MySqlAsync<'a, C> where C:Queryable + Send
 
     #[tracing::instrument(skip(self, query), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
     async fn delete_many<T, B>(&mut self, query: B) -> Result<u64, Self::Error>
-    where T: Delete, B: Borrow<Query<T>> + Send + Sync, 
+    where T: Delete, B: Borrow<Query<T>> + Send + Sync,
     <Self as ToqlApi>::Error: From<ToqlError> {
             delete(&mut self.backend, query).await?;
              Ok(0)
     }
 }
+            )+}}
+
+toql_api!(MySqlAsync<'a, C>, &mut MySqlAsync<'a, C>);
