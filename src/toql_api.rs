@@ -143,22 +143,22 @@ impl<'a, C> ToqlApi  for $type where C:Queryable + Send
         }
 
     #[tracing::instrument(skip(self, key), fields(ty = %<<K as Key>::Entity as toql::table_mapper::mapped::Mapped>::type_name()))]
-    async fn delete_one<K>(&mut self, key: K) -> Result<u64, Self::Error>
+    async fn delete_one<K>(&mut self, key: K) -> Result<(), Self::Error>
     where K: Key + Send, <K as Key>::Entity: Send,  <K as Key>::Entity: Delete ,
     K : Into<Query<<K as Key>::Entity>>
 
     {
             let query :Query<<K as Key>::Entity>= key.into();
             delete(&mut self.backend, query).await?;
-            Ok(0)
+            Ok(())
     }
 
     #[tracing::instrument(skip(self, query), fields(ty = %<T as toql::table_mapper::mapped::Mapped>::type_name()))]
-    async fn delete_many<T, B>(&mut self, query: B) -> Result<u64, Self::Error>
+    async fn delete_many<T, B>(&mut self, query: B) -> Result<(), Self::Error>
     where T: Delete, B: Borrow<Query<T>> + Send + Sync,
     <Self as ToqlApi>::Error: From<ToqlError> {
             delete(&mut self.backend, query).await?;
-             Ok(0)
+             Ok(())
     }
 }
             )+}}
