@@ -1,9 +1,11 @@
+//! Newtype for MySQL [Row](mysql_async::Row) type.
+//! This allows to implement the conversion trait [FromRow]( toql::from_row::FromRow) for basic data types
+//! without violating the orphan rule.
+
 use crate::error::ToqlMySqlAsyncError;
 use mysql_async::chrono::NaiveDateTime;
 use toql::sql_builder::select_stream::Select;
-/// Newtype for mysql database row
-/// This allows to implement the conversion traits for basic data
-/// without violating the orphan rule
+
 #[derive(Debug)]
 pub struct Row(pub mysql_async::Row);
 
@@ -42,7 +44,7 @@ macro_rules! from_row {
                              let v :Option<Result<Option<$type>, mysql_async::FromValueError>>  = row.0.get_opt(*i);
                              let v = v.ok_or(toql::error::ToqlError::DeserializeError(
                             toql::deserialize::error::DeserializeError::StreamEnd))?;
-                        
+
                             let v = v.map_err(ToqlMySqlAsyncError::from)?;
                             *i += 1;
                             Ok(v)
@@ -51,7 +53,7 @@ macro_rules! from_row {
                         }
                     }
                 }
-               
+
             )+
         };
         }
@@ -71,4 +73,3 @@ from_row!(
     f64,
     bool
 );
-

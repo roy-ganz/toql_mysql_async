@@ -1,6 +1,6 @@
 [package]
 name = "toql_mysql_async"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Roy Ganz <roy.ganz@glanis.biz>"]
 edition = "2018"
 description = "MySQL Async for Toql"
@@ -10,12 +10,9 @@ license = "MIT/Apache-2.0"
 repository = "https://github.com/roy-ganz/toql"
 
 [dependencies]
-toql = { version ="0.3", git="https://github.com/roy-ganz/toql.git" }
-
+toql = { version ="0.4", git="https://github.com/roy-ganz/toql.git" }
 mysql_async = "0.27"
 async-trait = "0.1"
-
-
 tracing= "0.1"
 lru="0.6"
 

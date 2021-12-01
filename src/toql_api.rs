@@ -1,36 +1,23 @@
+//! Implementation of [ToqlApi] for MySQL
+//! This allows to use all Toql high level functions with this backend.
+
 use async_trait::async_trait;
-
-use toql::keyed::Keyed;
-use toql::page::Page;
-
-use toql::query::Query;
-
-use toql::error::ToqlError;
-use toql::toql_api::ToqlApi;
-
-use core::borrow::Borrow;
-
-use crate::error::ToqlMySqlAsyncError;
-use crate::MySqlAsync;
-
-use crate::row::Row;
-use toql::prelude::{FromRow, Key};
-
-use std::borrow::BorrowMut;
-
-use toql::toql_api::{
-    count::Count, delete::Delete, fields::Fields, insert::Insert, load::Load, paths::Paths,
-    update::Update,
-};
-
 use toql::{
     backend::{count::count, delete::delete, insert::insert, load::load, update::update},
+    error::ToqlError,
+    keyed::Keyed,
+    page::Page,
     page_counts::PageCounts,
+    prelude::{FromRow, Key},
+    query::Query,
+    toql_api::ToqlApi,
+    toql_api::{
+        count::Count, delete::Delete, fields::Fields, insert::Insert, load::Load, paths::Paths,
+        update::Update,
+    },
 };
-
-use crate::queryable::Queryable;
-
-//use mysql_async::prelude::Queryable;
+use crate::{queryable::Queryable, row::Row, MySqlAsync, error::ToqlMySqlAsyncError};
+use std::borrow::{BorrowMut, Borrow};
 
 macro_rules! toql_api {
         ($($type:ty),+) => {

@@ -1,14 +1,17 @@
-
+//! The error type.
 use mysql_async::{Error, FromValueError};
-use toql::{error::ToqlError, sql_builder::sql_builder_error::SqlBuilderError};
 use std::fmt;
+use toql::{error::ToqlError, sql_builder::sql_builder_error::SqlBuilderError};
 
+/// An error type that combines all possible errors by this library.
 #[derive(Debug)]
 pub enum ToqlMySqlAsyncError {
+    /// Error from Toql
     ToqlError(ToqlError),
+    /// Database error from the MySQL 
     MySqlError(Error),
-    FromValueError(FromValueError)
-    
+    /// Deserialization error from the MySQL
+    FromValueError(FromValueError),
 }
 
 impl From<Error> for ToqlMySqlAsyncError {
@@ -18,7 +21,7 @@ impl From<Error> for ToqlMySqlAsyncError {
 }
 impl From<FromValueError> for ToqlMySqlAsyncError {
     fn from(err: FromValueError) -> ToqlMySqlAsyncError {
-       ToqlMySqlAsyncError::FromValueError(err)
+        ToqlMySqlAsyncError::FromValueError(err)
     }
 }
 impl From<ToqlError> for ToqlMySqlAsyncError {
@@ -35,13 +38,11 @@ impl From<SqlBuilderError> for ToqlMySqlAsyncError {
 impl fmt::Display for ToqlMySqlAsyncError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ToqlMySqlAsyncError::ToqlError(e) => { e.fmt(f)}
-            ToqlMySqlAsyncError::MySqlError(e) => {e.fmt(f)}
-            ToqlMySqlAsyncError::FromValueError(e) => {e.fmt(f)}
+            ToqlMySqlAsyncError::ToqlError(e) => e.fmt(f),
+            ToqlMySqlAsyncError::MySqlError(e) => e.fmt(f),
+            ToqlMySqlAsyncError::FromValueError(e) => e.fmt(f),
         }
-       
     }
 }
 
 impl std::error::Error for ToqlMySqlAsyncError {}
-

@@ -1,3 +1,5 @@
+//! Conversion from [SqlArg] to MySQL query types.
+
 use mysql_async::Value;
 use toql::sql_arg::SqlArg;
 
