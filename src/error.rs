@@ -8,7 +8,7 @@ use toql::{error::ToqlError, sql_builder::sql_builder_error::SqlBuilderError};
 pub enum ToqlMySqlAsyncError {
     /// Error from Toql
     ToqlError(ToqlError),
-    /// Database error from the MySQL 
+    /// Database error from the MySQL
     MySqlError(Error),
     /// Deserialization error from the MySQL
     FromValueError(FromValueError),

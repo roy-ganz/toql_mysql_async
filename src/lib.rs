@@ -134,6 +134,6 @@ where
         &self.backend.context.aux_params
     }
     pub fn set_aux_param(&mut self, name: String, value: SqlArg) {
-        &self.backend.context.aux_params.insert(name, value);
+        self.backend.context.aux_params.insert(name, value);
     }
 }

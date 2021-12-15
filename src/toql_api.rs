@@ -1,7 +1,9 @@
 //! Implementation of [ToqlApi] for MySQL
 //! This allows to use all Toql high level functions with this backend.
 
+use crate::{error::ToqlMySqlAsyncError, queryable::Queryable, row::Row, MySqlAsync};
 use async_trait::async_trait;
+use std::borrow::{Borrow, BorrowMut};
 use toql::{
     backend::{count::count, delete::delete, insert::insert, load::load, update::update},
     error::ToqlError,
@@ -16,8 +18,6 @@ use toql::{
         update::Update,
     },
 };
-use crate::{queryable::Queryable, row::Row, MySqlAsync, error::ToqlMySqlAsyncError};
-use std::borrow::{BorrowMut, Borrow};
 
 macro_rules! toql_api {
         ($($type:ty),+) => {
