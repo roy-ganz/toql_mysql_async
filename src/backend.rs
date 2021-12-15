@@ -1,10 +1,14 @@
 //! Backend to implement database specific calls
-use toql::{sql_builder::build_result::BuildResult, prelude::{
-    log_literal_sql, log_mut_sql, log_sql, val, AliasFormat, Cache, Context, Page, Sql, SqlArg,
-    TableMapperRegistry, ToqlError,
-}, backend::Backend};
+use toql::{
+    backend::Backend,
+    prelude::{
+        log_literal_sql, log_mut_sql, log_sql, val, AliasFormat, Cache, Context, Page, Sql, SqlArg,
+        TableMapperRegistry, ToqlError,
+    },
+    sql_builder::build_result::BuildResult,
+};
 
-use crate::{row::Row, result::Result, error::ToqlMySqlAsyncError, queryable::Queryable};
+use crate::{error::ToqlMySqlAsyncError, queryable::Queryable, result::Result, row::Row};
 
 use std::{
     collections::{HashMap, HashSet},
@@ -13,7 +17,7 @@ use std::{
 
 use async_trait::async_trait;
 
-/// The MySQlAsyncBackend is called by the [Backend] functions. 
+/// The MySQlAsyncBackend is called by the [Backend] functions.
 /// While the backend functions are called by the ToqlApi implementation of
 /// [MySQLAsync](crate::MySqlAsync)
 /// For internal use only.
