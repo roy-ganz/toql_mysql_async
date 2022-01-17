@@ -1,6 +1,5 @@
 //! The error type.
 use mysql_async::{Error, FromValueError};
-use std::fmt;
 use toql::{error::ToqlError, sql_builder::sql_builder_error::SqlBuilderError};
 use thiserror::Error;
 
