@@ -37,43 +37,29 @@
 //! Toql MySqlAsync is distributed under the terms of both the MIT license and the
 //! Apache License (Version 2.0).
 
-use toql::table_mapper_registry::TableMapperRegistry;
-
-use toql::error::ToqlError;
-
-use toql::alias_format::AliasFormat;
-
 use std::{
     collections::{HashMap, HashSet},
     sync::RwLockReadGuard,
 };
-
-#[macro_use]
-pub mod access;
-
-pub mod sql_arg;
-
-pub mod error;
-pub mod result;
-pub mod row;
-
-pub mod backend;
-
-pub mod prelude;
-pub mod toql_api;
-
-pub mod queryable;
+use toql::{error::ToqlError, alias_format::AliasFormat, prelude::{Cache, Context, SqlArg}, table_mapper_registry::TableMapperRegistry};
+use crate::{queryable::Queryable, backend::MySqlAsyncBackend};
 
 // Reexport for derive produced code
 pub use mysql_async;
 
+#[macro_use]
+pub mod access;
+pub mod sql_arg;
+pub mod error;
+pub mod result;
+pub mod row;
+pub mod backend;
+pub mod prelude;
+pub mod toql_api;
+pub mod queryable;
+
 #[cfg(test)]
 mod test;
-
-use crate::backend::MySqlAsyncBackend;
-use toql::prelude::{Cache, Context, SqlArg};
-//use mysql_async::prelude::Queryable;
-use crate::queryable::Queryable;
 
 pub struct MySqlAsync<'a, C>
 where

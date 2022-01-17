@@ -70,7 +70,9 @@ where
             Page::Uncounted(start, records) => (start, records),
             Page::Counted(start, records) => (start, records),
         };
-        result.set_modifier("SQL_CALC_FOUND_ROWS".to_string());
+        if page.is_counted() {
+            result.set_modifier("SQL_CALC_FOUND_ROWS".to_string());
+        }
         result.set_extra(format!("LIMIT {}, {}", start, number_of_records));
     }
     // Load page and number of records without page limitation
