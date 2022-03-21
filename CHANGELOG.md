@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Ommit SQL_CALC_FOUND_ROWS when not needed
 
 ### Changed
+- Use mysql_async 0.29 to fix broken mio dependency.
 - Use thiserror
 - Remove unused lru dependency
 

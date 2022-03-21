@@ -11,10 +11,12 @@ repository = "https://github.com/roy-ganz/toql"
 
 [dependencies]
 toql = { version ="^0.4.2", git="https://github.com/roy-ganz/toql.git" }
-mysql_async = "0.27"
+mysql_async = "0.29"
 async-trait = "0.1"
 tracing= "0.1"
 thiserror = "1"
+mysql_common = {version= "0.28", features=["chrono"]}
+futures-core = "0.3"
 
 [dev-dependencies]
 tokio ={ version = "1", features = ["full"] }

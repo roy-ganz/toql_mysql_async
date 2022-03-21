@@ -46,6 +46,7 @@ use crate::{queryable::Queryable, backend::MySqlAsyncBackend};
 
 // Reexport for derive produced code
 pub use mysql_async;
+pub use mysql_common::chrono;
 
 #[macro_use]
 pub mod access;

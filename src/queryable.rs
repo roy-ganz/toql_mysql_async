@@ -1,6 +1,7 @@
 //! A reimplementation of [Queryable](crate::mysql_async::prelude::Queryable) that allows calls on [Conn] and &mut [Conn].
 use mysql_async::prelude::{FromRow, StatementLike};
-use mysql_async::{BoxFuture, Conn, Params, Transaction};
+use mysql_async::{Result, Conn, Params, Transaction};
+type BoxFuture<'a, T> = futures_core::future::BoxFuture<'a, Result<T>>;
 
 pub trait Queryable {
     fn exec<'a: 'b, 'b, T, S, P>(&'a mut self, stmt: S, params: P) -> BoxFuture<'b, Vec<T>>

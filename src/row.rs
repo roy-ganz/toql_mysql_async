@@ -3,7 +3,7 @@
 //! without violating the orphan rule.
 
 use crate::error::ToqlMySqlAsyncError;
-use mysql_async::chrono::NaiveDateTime;
+use mysql_common::chrono::NaiveDateTime;
 use toql::sql_builder::select_stream::Select;
 
 #[derive(Debug)]
