@@ -7,8 +7,8 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-toql = {version = "0.3", features = ["serde"]}
-toql_mysql_async = "0.3"
+toql = {version = "0.4", features = ["serde"]}
+toql_mysql_async = "0.4"
 ```
 
 And get your Toql with 
