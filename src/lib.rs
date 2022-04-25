@@ -95,6 +95,7 @@ where
                 conn,
                 cache,
                 context,
+                auto_increment: None
             },
         }
     }

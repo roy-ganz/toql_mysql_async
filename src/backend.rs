@@ -28,6 +28,7 @@ where
     pub conn: C,
     pub(crate) context: Context,
     pub(crate) cache: &'a Cache,
+    pub auto_increment: Option<u64>
 }
 
 /// Interface for Toql functions
@@ -112,13 +113,20 @@ where
         let affected_rows = val!(affected_rows);
         let start_id = val!(last_insert_id);
         let mut ids: Vec<SqlArg> = Vec::with_capacity(affected_rows as usize);
+        if self.auto_increment.is_none() {
+            let auto_increment_sql = "SELECT @@auto_increment_increment";
+            log_literal_sql!(&auto_increment_sql);
+            let auto_increment: Option<u64> = self.conn.query_first(auto_increment_sql).await?;
+            self.auto_increment = auto_increment;
+        }
+        let auto_increment = self.auto_increment.unwrap_or(1);
 
         // Create ids in descending order: greatest id first, smallest id last
         // This allows draining the Vec when setting the ids on the entities
-        let mut id = start_id + affected_rows - 1;
+        let mut id = start_id + affected_rows * auto_increment - auto_increment;
         for _i in 0..affected_rows {
             ids.push(SqlArg::U64(id.into()));
-            id -= 1;
+            id -= auto_increment;
         }
         Ok(ids)
     }

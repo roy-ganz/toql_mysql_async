@@ -1,6 +1,6 @@
 [package]
 name = "toql_mysql_async"
-version = "0.4.2"
+version = "0.4.3"
 authors = ["Roy Ganz <roy.ganz@glanis.biz>"]
 edition = "2018"
 description = "MySQL Async for Toql"
